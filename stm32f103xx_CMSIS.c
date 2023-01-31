@@ -115,7 +115,7 @@ void CMSIS_RCC_SystemClock_72MHz(void) {
 	*  1 : internal 8 MHz RC oscillator ready
 	*/
 
-	while (READ_BIT(RCC->CR, RCC_CR_HSIRDY) == 0); //Дождемся поднятия флага о готовности
+	while (READ_BIT(RCC->CR, RCC_CR_HSIRDY) == 0) ; //Дождемся поднятия флага о готовности
 
 	/**
 	*  Bit 2 Reserved, must be kept at reset value.
@@ -169,7 +169,7 @@ void CMSIS_RCC_SystemClock_72MHz(void) {
 	*  1: HSE oscillator ready
 	*/
 
-	while (READ_BIT(RCC->CR, RCC_CR_HSERDY) == 0); //Дождемся поднятия флага о готовности
+	while (READ_BIT(RCC->CR, RCC_CR_HSERDY) == 0) ; //Дождемся поднятия флага о готовности
 
 	/**
 	*  Bit 19 CSSON: Clock security system enable
@@ -276,11 +276,11 @@ void CMSIS_RCC_SystemClock_72MHz(void) {
 	*/
 	//Тут я пока не понял, поэтому не трогал
 
-/**
-*  Bit 4 PRFTBE: Prefetch buffer enable
-*  0: Prefetch is disabled
-*  1: Prefetch is enabled
-*/
+	/**
+	*  Bit 4 PRFTBE: Prefetch buffer enable
+	*  0: Prefetch is disabled
+	*  1: Prefetch is enabled
+	*/
 
 	SET_BIT(FLASH->ACR, FLASH_ACR_PRFTBE); //Prefetch is enabled
 
@@ -428,7 +428,7 @@ void CMSIS_RCC_SystemClock_72MHz(void) {
 	*  1: PLL locked
 	*/
 
-	while (READ_BIT(RCC->CR, RCC_CR_PLLRDY) == 0); //Дожидемся поднятия флага включения PLL
+	while (READ_BIT(RCC->CR, RCC_CR_PLLRDY) == 0) ; //Дожидемся поднятия флага включения PLL
 
 	//В итоге должно получится:
 	//RCC->CR == 0x030B5A83
@@ -461,15 +461,15 @@ When the processor is halted for debugging the counter does not decrement.*/
 void CMSIS_SysTick_Timer_init(void) {
 	/* п. 4.5.1 SysTick control and status register (STK_CTRL) (стр. 151)*/
 
-/**
-*  Bit 0 ENABLE : Counter enable
-*  Enables the counter.When ENABLE is set to 1, the counter loads the RELOAD value from the
-*  LOAD register and then counts down.On reaching 0, it sets the COUNTFLAG to 1 and
-*  optionally asserts the SysTick depending on the value of TICKINT.It then loads the RELOAD
-*  value again, and begins counting.
-*  0 : Counter disabled
-*  1 : Counter enabled
-*/
+	/**
+	*  Bit 0 ENABLE : Counter enable
+	*  Enables the counter.When ENABLE is set to 1, the counter loads the RELOAD value from the
+	*  LOAD register and then counts down.On reaching 0, it sets the COUNTFLAG to 1 and
+	*  optionally asserts the SysTick depending on the value of TICKINT.It then loads the RELOAD
+	*  value again, and begins counting.
+	*  0 : Counter disabled
+	*  1 : Counter enabled
+	*/
 
 	CLEAR_BIT(SysTick->CTRL, SysTick_CTRL_ENABLE_Msk); //Выключим таймер для проведения настроек.
 
@@ -561,7 +561,7 @@ volatile uint32_t Timeout_counter_ms = 0; //Переменная для тайм
  */
 void Delay_ms(uint32_t Milliseconds) {
 	Delay_counter_ms = Milliseconds;
-	while (Delay_counter_ms != 0);
+	while (Delay_counter_ms != 0) ;
 }
 
 /**
@@ -1199,7 +1199,7 @@ void CMSIS_ADC_DMA_init(void) {
 	 * Этот бит устанавливается программой для запуска калибровки.
 	 * Он сбрасывается аппаратно после завершения калибровки.*/
 
-	while (READ_BIT(ADC1->CR2, ADC_CR2_CAL));//Подождем окончания калибровки
+	while (READ_BIT(ADC1->CR2, ADC_CR2_CAL)) ;//Подождем окончания калибровки
 	Delay_ms(1); //Задержка для GD32F103CBT6. На STM32F103CBT6 работает и так. 
 
 	SET_BIT(ADC1->CR2, ADC_CR2_DMA); //DMA включен
@@ -1247,8 +1247,7 @@ __WEAK void DMA1_Channel1_IRQHandler(void) {
 		SET_BIT(DMA1->IFCR, DMA_IFCR_CGIF1); //Сбросим глобальный флаг.
 		/*Здесь можно писать код*/
 
-	}
-	else if (READ_BIT(DMA1->ISR, DMA_ISR_TEIF1)) {
+	} else if (READ_BIT(DMA1->ISR, DMA_ISR_TEIF1)) {
 		/*Здесь можно сделать какой-то обработчик ошибок*/
 		SET_BIT(DMA1->IFCR, DMA_IFCR_CGIF1); //Сбросим глобальный флаг.
 	}
@@ -1646,9 +1645,9 @@ void CMSIS_I2C_Reset(void) {
 	//Сброс настроек I2C
 	//п.п. 26.6.1 I2C Control register 1 (I2C_CR1) (стр. 772)
 	SET_BIT(I2C1->CR1, I2C_CR1_SWRST); //: I2C Peripheral not under reset
-	while (READ_BIT(I2C1->CR1, I2C_CR1_SWRST) == 0);
+	while (READ_BIT(I2C1->CR1, I2C_CR1_SWRST) == 0) ;
 	CLEAR_BIT(I2C1->CR1, I2C_CR1_SWRST); //: I2C Peripheral not under reset
-	while (READ_BIT(I2C1->CR1, I2C_CR1_SWRST));
+	while (READ_BIT(I2C1->CR1, I2C_CR1_SWRST)) ;
 	/* Примечание: Этот бит можно использовать для повторной инициализации
 	 * периферийного устройства после ошибки или заблокированного состояния.
 	 * Например, если бит BUSY установлен и остается заблокированным из-за сбоя на шине,
@@ -1797,8 +1796,7 @@ bool CMSIS_I2C_Adress_Device_Scan(I2C_TypeDef* I2C, uint8_t Adress_Device, uint3
 		I2C->SR1;
 		I2C->SR2;
 		return true;
-	}
-	else {
+	} else {
 		//Если устройство не отозвалось, прилетит 1 в I2C_SR1_AF 
 		SET_BIT(I2C->CR1, I2C_CR1_STOP); //Отправляем сигнал STOP
 		CLEAR_BIT(I2C->SR1, I2C_SR1_AF); //Сбрасываем бит AF
@@ -1897,8 +1895,7 @@ bool CMSIS_I2C_Data_Transmit(I2C_TypeDef* I2C, uint8_t Adress_Device, uint8_t* d
 
 		return true;
 
-	}
-	else {
+	} else {
 		//Если устройство не отозвалось, прилетит 1 в I2C_SR1_AF 
 		SET_BIT(I2C->CR1, I2C_CR1_STOP); //Останавливаем
 		CLEAR_BIT(I2C->SR1, I2C_SR1_AF); //Сбрасываем бит AF
@@ -1992,8 +1989,7 @@ bool CMSIS_I2C_Data_Receive(I2C_TypeDef* I2C, uint8_t Adress_Device, uint8_t* da
 				}
 
 				*(data + i) = I2C->DR; //Чтение байта
-			}
-			else {
+			} else {
 				CLEAR_BIT(I2C->CR1, I2C_CR1_ACK); //Если мы знаем, что следующий принятый байт будет последним, то отправим NACK
 
 				SET_BIT(I2C->CR1, I2C_CR1_STOP); //Останавливаем
@@ -2008,8 +2004,7 @@ bool CMSIS_I2C_Data_Receive(I2C_TypeDef* I2C, uint8_t Adress_Device, uint8_t* da
 			}
 		} return true;
 
-	}
-	else {
+	} else {
 		//Если устройство не отозвалось, прилетит 1 в I2C_SR1_AF 
 		SET_BIT(I2C->CR1, I2C_CR1_STOP); //Останавливаем
 		CLEAR_BIT(I2C->SR1, I2C_SR1_AF); //Сбрасываем бит AF
@@ -2124,8 +2119,7 @@ bool CMSIS_I2C_MemWrite(I2C_TypeDef* I2C, uint8_t Adress_Device, uint16_t Adress
 
 		return true;
 
-	}
-	else {
+	} else {
 		//Если устройство не отозвалось, прилетит 1 в I2C_SR1_AF 
 		SET_BIT(I2C->CR1, I2C_CR1_STOP); //Останавливаем
 		CLEAR_BIT(I2C->SR1, I2C_SR1_AF); //Сбрасываем бит AF
@@ -2259,28 +2253,25 @@ bool CMSIS_I2C_MemRead(I2C_TypeDef* I2C, uint8_t Adress_Device, uint16_t Adress_
 			for (uint16_t i = 0; i < Size_data; i++) {
 				if (i < Size_data - 1) {
 					SET_BIT(I2C->CR1, I2C_CR1_ACK); //Если мы хотим принять следующий байт, то отправляем ACK 
-					while (READ_BIT(I2C->SR1, I2C_SR1_RXNE) == 0);
+					while (READ_BIT(I2C->SR1, I2C_SR1_RXNE) == 0) ;
 					*(data + i) = I2C->DR; //Чтение байта
-				}
-				else {
+				} else {
 					CLEAR_BIT(I2C->CR1, I2C_CR1_ACK); //Если мы знаем, что следующий принятый байт будет последним, то отправим NACK
 
 					SET_BIT(I2C->CR1, I2C_CR1_STOP); //Останавливаем
-					while (READ_BIT(I2C->SR1, I2C_SR1_RXNE) == 0); //Подождем, пока сдвиговый регистр пополнится новым байтом данных
+					while (READ_BIT(I2C->SR1, I2C_SR1_RXNE) == 0) ; //Подождем, пока сдвиговый регистр пополнится новым байтом данных
 					*(data + i) = I2C->DR; //Чтение байта
 				}
 			} return true;
 
-		}
-		else {
+		} else {
 			//Если устройство не отозвалось, прилетит 1 в I2C_SR1_AF 
 			SET_BIT(I2C->CR1, I2C_CR1_STOP); //Останавливаем
 			CLEAR_BIT(I2C->SR1, I2C_SR1_AF); //Сбрасываем бит AF
 			return false;
 		}
 
-	}
-	else {
+	} else {
 		//Если устройство не отозвалось, прилетит 1 в I2C_SR1_AF 
 		SET_BIT(I2C->CR1, I2C_CR1_STOP); //Останавливаем
 		CLEAR_BIT(I2C->SR1, I2C_SR1_AF); //Сбрасываем бит AF
@@ -2370,32 +2361,33 @@ void CMSIS_SPI1_init(void) {
 	 //Настроим сами ножки уже после инициализации SPI, чтоб при старте не было лишних ногодерганий. 	
 
 	 /*SPI control register 1 (SPI_CR1) (not used in I2S mode)(см. п.п. 25.5.1 стр 742)*/
-    /*
-     * Bits 5:3 BR[2:0]: Baud rate control
-     * 000: fPCLK/2
-     * 001: fPCLK/4
-     * 010: fPCLK/8
-     * 011: fPCLK/16
-     * 100: fPCLK/32
-     * 101: fPCLK/64
-     * 110: fPCLK/128
-     * 111: fPCLK/256 
-     * */
-	MODIFY_REG(SPI1->CR1, SPI_CR1_BR, 0b100 << SPI_CR1_BR_Pos); //fPCLK/4. 72000000/32 = 2.22 MBits/s
-	CLEAR_BIT(SPI1->CR1, SPI_CR1_CPOL); //0: CK to 0 when idle
-	CLEAR_BIT(SPI1->CR1, SPI_CR1_CPHA); //0: The first clock transition is the first data capture edge
-	SET_BIT(SPI1->CR1, SPI_CR1_DFF); //0: 8-bit data frame format is selected for transmission/reception
+	/*
+	 * Bits 5:3 BR[2:0]: Baud rate control
+	 * 000: fPCLK/2
+	 * 001: fPCLK/4
+	 * 010: fPCLK/8
+	 * 011: fPCLK/16
+	 * 100: fPCLK/32
+	 * 101: fPCLK/64
+	 * 110: fPCLK/128
+	 * 111: fPCLK/256
+	 * */
+	MODIFY_REG(SPI1->CR1, SPI_CR1_BR, 0b011 << SPI_CR1_BR_Pos); //fPCLK/4. 72000000/32 = 2.22 MBits/s
+	SET_BIT(SPI1->CR1, SPI_CR1_CPOL); //Полярность
+	SET_BIT(SPI1->CR1, SPI_CR1_CPHA); //Фаза
+	CLEAR_BIT(SPI1->CR1, SPI_CR1_DFF); //0: 8-bit data frame format is selected for transmission/reception
 	CLEAR_BIT(SPI1->CR1, SPI_CR1_LSBFIRST); //0: MSB transmitted first
 	SET_BIT(SPI1->CR1, SPI_CR1_SSM); //1: Software slave management enabled
 	SET_BIT(SPI1->CR1, SPI_CR1_SSI); //1: Software slave management enabled
 	SET_BIT(SPI1->CR1, SPI_CR1_MSTR); //1: Master configuration
-	SET_BIT(SPI1->CR1, SPI_CR1_SPE); //Включим SPI
-
+	CLEAR_BIT(SPI1->CR1, SPI_CR1_BIDIMODE); //0: 2-line unidirectional data mode selected
 	CLEAR_BIT(SPI1->CR1, SPI_CR1_RXONLY); //0: Full duplex (Transmit and receive)
 
+	SET_BIT(SPI1->CR1, SPI_CR1_SPE); //Включим SPI
+    
 	CLEAR_BIT(SPI1->CR1, SPI_CR1_CRCEN); //0: CRC calculation disabled
 	CLEAR_BIT(SPI1->CR1, SPI_CR1_CRCNEXT); // 0: Data phase (no CRC phase) 
-	CLEAR_BIT(SPI1->CR1, SPI_CR1_BIDIMODE); //0: 2-line unidirectional data mode selected
+ 
 
 
 	/*SPI control register 2 (SPI_CR2) (см. п.п. 25.5.2 стр 744)*/
@@ -2432,9 +2424,13 @@ void CMSIS_SPI1_init(void) {
  **************************************************************************************************
  */
 bool CMSIS_SPI_Data_Transmit_8BIT(SPI_TypeDef* SPI, uint8_t* data, uint16_t Size_data, uint32_t Timeout_ms) {
+	//(см. Reference Manual стр. 712 Transmit-only procedure (BIDIMODE=0 RXONLY=0))
 	if (!READ_BIT(SPI->SR, SPI_SR_BSY)) {
-		//Если шина MOSI свободна, то отправляем данные
-		for (uint16_t i = 0; i < Size_data; i++) {
+		//Проверим занятость шины
+		SPI->DR = *(data); //Запишем первый элемент данных для отправки в регистр SPI_DR
+		//(При этом очищается бит TXE)
+        
+		for (uint16_t i = 1; i < Size_data; i++) {
 			Timeout_counter_ms = Timeout_ms;
 			while (!READ_BIT(SPI->SR, SPI_SR_TXE)) {
 				//Ждем, пока буфер на передачу не освободится
@@ -2442,20 +2438,30 @@ bool CMSIS_SPI_Data_Transmit_8BIT(SPI_TypeDef* SPI, uint8_t* data, uint16_t Size
 					return false;
 				}
 			}
-			SPI->DR = *(data + i);
+			SPI->DR = *(data + i); //Запишем следующий элемент данных.
+		}
+		Timeout_counter_ms = Timeout_ms;
+		while (!READ_BIT(SPI->SR, SPI_SR_TXE)) {
+			//После записи последнего элемента данных в регистр SPI_DR,
+			//подождем, пока TXE станет равным 1.
+			if (!Timeout_counter_ms) {
+				return false;
+			}
 		}
 		Timeout_counter_ms = Timeout_ms;
 		while (READ_BIT(SPI->SR, SPI_SR_BSY)) {
-			//Ждем, пока мы освободим шину
+			//Затем подождем, пока BSY станет равным 0.
+			//Это указывает на то, что передача последних данных завершена.
 			if (!Timeout_counter_ms) {
 				return false;
 			}
 		}
 		return true;
-	}
-	else {
+	} else {
 		return false;
 	}
+	//Примечание:
+	//После передачи двух элементов данных в режиме "transmit-only mode" в регистре SPI_SR устанавливается флаг OVR, так как принятые данные никогда не считываются.
 }
 
 /**
@@ -2468,9 +2474,13 @@ bool CMSIS_SPI_Data_Transmit_8BIT(SPI_TypeDef* SPI, uint8_t* data, uint16_t Size
  **************************************************************************************************
  */
 bool CMSIS_SPI_Data_Transmit_16BIT(SPI_TypeDef* SPI, uint16_t* data, uint16_t Size_data, uint32_t Timeout_ms) {
+	//(см. Reference Manual стр. 712 Transmit-only procedure (BIDIMODE=0 RXONLY=0))
 	if (!READ_BIT(SPI->SR, SPI_SR_BSY)) {
-		//Если шина MOSI свободна, то отправляем данные
-		for (uint16_t i = 0; i < Size_data; i++) {
+		//Проверим занятость шины
+		SPI->DR = *(data); //Запишем первый элемент данных для отправки в регистр SPI_DR
+		//(При этом очищается бит TXE)
+        
+		for (uint16_t i = 1; i < Size_data; i++) {
 			Timeout_counter_ms = Timeout_ms;
 			while (!READ_BIT(SPI->SR, SPI_SR_TXE)) {
 				//Ждем, пока буфер на передачу не освободится
@@ -2478,20 +2488,30 @@ bool CMSIS_SPI_Data_Transmit_16BIT(SPI_TypeDef* SPI, uint16_t* data, uint16_t Si
 					return false;
 				}
 			}
-			SPI->DR = *(data + i);
+			SPI->DR = *(data + i); //Запишем следующий элемент данных.
+		}
+		Timeout_counter_ms = Timeout_ms;
+		while (!READ_BIT(SPI->SR, SPI_SR_TXE)) {
+			//После записи последнего элемента данных в регистр SPI_DR,
+			//подождем, пока TXE станет равным 1.
+			if (!Timeout_counter_ms) {
+				return false;
+			}
 		}
 		Timeout_counter_ms = Timeout_ms;
 		while (READ_BIT(SPI->SR, SPI_SR_BSY)) {
-			//Ждем, пока мы освободим шину
+			//Затем подождем, пока BSY станет равным 0.
+			//Это указывает на то, что передача последних данных завершена.
 			if (!Timeout_counter_ms) {
 				return false;
 			}
 		}
 		return true;
-	}
-	else {
+	} else {
 		return false;
 	}
+	//Примечание:
+	//После передачи двух элементов данных в режиме "transmit-only mode" в регистре SPI_SR устанавливается флаг OVR, так как принятые данные никогда не считываются.
 }
 
 /**
@@ -2505,9 +2525,18 @@ bool CMSIS_SPI_Data_Transmit_16BIT(SPI_TypeDef* SPI, uint16_t* data, uint16_t Si
  */
 bool CMSIS_SPI_Data_Receive_8BIT(SPI_TypeDef* SPI, uint8_t* data, uint16_t Size_data, uint32_t Timeout_ms) {
 	if (!READ_BIT(SPI->SR, SPI_SR_BSY)) {
-		//Если шина MOSI свободна, то принимаем данные
+		//Проверим занятость шины
+        
+		if (READ_BIT(SPI->SR, SPI_SR_OVR) || READ_BIT(SPI->SR, SPI_SR_RXNE)) {
+			//Т.к. мы можем принимать данные в любой момент, например после режима "transmit-only mode"
+			//то следует проверить статусы OVR и RXNE. Если хотя бы один из них установлен, 
+			//то сбросим их при помощи чтения регистра DR.
+			SPI->DR;
+		}
+        
+		//Начнем прием данных
 		for (uint16_t i = 0; i < Size_data; i++) {
-			SPI->DR = 0; //Запустим тактирование
+			SPI->DR = 0; //Запустим тактирование, чтоб считать 8 бит
 			Timeout_counter_ms = Timeout_ms;
 			while (!READ_BIT(SPI->SR, SPI_SR_RXNE)) {
 				//Ждем, пока буфер на прием не заполнится
@@ -2515,18 +2544,19 @@ bool CMSIS_SPI_Data_Receive_8BIT(SPI_TypeDef* SPI, uint8_t* data, uint16_t Size_
 					return false;
 				}
 			}
-			*(data + i) = SPI->DR;
+			*(data + i) = SPI->DR; //Считываем данные
 		}
+        
 		Timeout_counter_ms = Timeout_ms;
 		while (READ_BIT(SPI->SR, SPI_SR_BSY)) {
-			//Ждем, пока мы освободим шину
+			//Затем подождем, пока BSY станет равным 0.
+			//Это указывает на то, что прием последних данных завершен.
 			if (!Timeout_counter_ms) {
 				return false;
 			}
 		}
 		return true;
-	}
-	else {
+	} else {
 		return false;
 	}
 }
@@ -2542,9 +2572,18 @@ bool CMSIS_SPI_Data_Receive_8BIT(SPI_TypeDef* SPI, uint8_t* data, uint16_t Size_
  */
 bool CMSIS_SPI_Data_Receive_16BIT(SPI_TypeDef* SPI, uint16_t* data, uint16_t Size_data, uint32_t Timeout_ms) {
 	if (!READ_BIT(SPI->SR, SPI_SR_BSY)) {
-		//Если шина MOSI свободна, то принимаем данные
+		//Проверим занятость шины
+        
+		if (READ_BIT(SPI->SR, SPI_SR_OVR) || READ_BIT(SPI->SR, SPI_SR_RXNE)) {
+			//Т.к. мы можем принимать данные в любой момент, например после режима "transmit-only mode"
+			//то следует проверить статусы OVR и RXNE. Если хотя бы один из них установлен, 
+			//то сбросим их при помощи чтения регистра DR.
+			SPI->DR;
+		}
+        
+		//Начнем прием данных
 		for (uint16_t i = 0; i < Size_data; i++) {
-			SPI->DR = 0; //Запустим тактирование
+			SPI->DR = 0; //Запустим тактирование, чтоб считать 16 бит
 			Timeout_counter_ms = Timeout_ms;
 			while (!READ_BIT(SPI->SR, SPI_SR_RXNE)) {
 				//Ждем, пока буфер на прием не заполнится
@@ -2552,22 +2591,19 @@ bool CMSIS_SPI_Data_Receive_16BIT(SPI_TypeDef* SPI, uint16_t* data, uint16_t Siz
 					return false;
 				}
 			}
-			*(data + i) = SPI->DR;
+			*(data + i) = SPI->DR; //Считываем данные
 		}
+        
 		Timeout_counter_ms = Timeout_ms;
 		while (READ_BIT(SPI->SR, SPI_SR_BSY)) {
-			//Ждем, пока мы освободим шину
+			//Затем подождем, пока BSY станет равным 0.
+			//Это указывает на то, что прием последних данных завершен.
 			if (!Timeout_counter_ms) {
 				return false;
 			}
 		}
 		return true;
-	}
-	else {
+	} else {
 		return false;
 	}
 }
-
-
-
-
